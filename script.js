@@ -17,37 +17,57 @@ document.addEventListener('DOMContentLoaded', () => {
         symbol: getRandomSymbol
     };
 
-    // Length control buttons
-    decreaseBtn.addEventListener('click', () => {
+    // Prevent form submission on button clicks
+    [decreaseBtn, increaseBtn].forEach(btn => {
+        btn.type = 'button'; // Explicitly set button type
+        btn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent any default form submission
+        });
+    });
+
+    // Length control buttons with improved handling
+    decreaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         let currentValue = parseInt(lengthEl.value);
         if (currentValue > parseInt(lengthEl.min)) {
-            lengthEl.value = currentValue - 1;
-            generateBtn.click();
+            currentValue -= 1;
+            lengthEl.value = currentValue;
+            generateNewPassword();
         }
     });
 
-    increaseBtn.addEventListener('click', () => {
+    increaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         let currentValue = parseInt(lengthEl.value);
         if (currentValue < parseInt(lengthEl.max)) {
-            lengthEl.value = currentValue + 1;
-            generateBtn.click();
+            currentValue += 1;
+            lengthEl.value = currentValue;
+            generateNewPassword();
         }
     });
 
     // Length input validation
-    lengthEl.addEventListener('change', () => {
+    lengthEl.addEventListener('input', () => {
         let value = parseInt(lengthEl.value);
         const min = parseInt(lengthEl.min);
         const max = parseInt(lengthEl.max);
         
-        if (value < min) lengthEl.value = min;
-        if (value > max) lengthEl.value = max;
+        if (isNaN(value)) {
+            lengthEl.value = min;
+            value = min;
+        } else {
+            if (value < min) lengthEl.value = min;
+            if (value > max) lengthEl.value = max;
+        }
         
-        generateBtn.click();
+        generateNewPassword();
     });
 
     // Generate event listen
-    generateBtn.addEventListener('click', () => {
+    generateBtn.addEventListener('click', generateNewPassword);
+
+    // Function to generate new password
+    function generateNewPassword() {
         const length = +lengthEl.value;
         const hasLower = lowercaseEl.checked;
         const hasUpper = uppercaseEl.checked;
@@ -61,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hasSymbol, 
             length
         );
-    });
+    }
 
     // Copy password to clipboard
     copyBtn.addEventListener('click', () => {
@@ -72,7 +92,26 @@ document.addEventListener('DOMContentLoaded', () => {
         
         navigator.clipboard.writeText(password)
             .then(() => {
-                alert('Password copied to clipboard!');
+                // Create and show temporary notification
+                const notification = document.createElement('div');
+                notification.textContent = 'Password copied!';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    z-index: 1000;
+                `;
+                document.body.appendChild(notification);
+                
+                // Remove notification after 2 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 2000);
             })
             .catch(err => {
                 console.error('Failed to copy password:', err);
@@ -127,5 +166,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Generate initial password
-    generateBtn.click();
+    generateNewPassword();
 });
