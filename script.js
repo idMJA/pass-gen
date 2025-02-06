@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const symbolsEl = document.getElementById('symbols');
     const generateBtn = document.getElementById('generate-btn');
     const copyBtn = document.getElementById('copy-btn');
+    const decreaseBtn = document.getElementById('decrease-btn');
+    const increaseBtn = document.getElementById('increase-btn');
 
     const randomFunc = {
         lower: getRandomLower,
@@ -14,6 +16,35 @@ document.addEventListener('DOMContentLoaded', () => {
         number: getRandomNumber,
         symbol: getRandomSymbol
     };
+
+    // Length control buttons
+    decreaseBtn.addEventListener('click', () => {
+        let currentValue = parseInt(lengthEl.value);
+        if (currentValue > parseInt(lengthEl.min)) {
+            lengthEl.value = currentValue - 1;
+            generateBtn.click();
+        }
+    });
+
+    increaseBtn.addEventListener('click', () => {
+        let currentValue = parseInt(lengthEl.value);
+        if (currentValue < parseInt(lengthEl.max)) {
+            lengthEl.value = currentValue + 1;
+            generateBtn.click();
+        }
+    });
+
+    // Length input validation
+    lengthEl.addEventListener('change', () => {
+        let value = parseInt(lengthEl.value);
+        const min = parseInt(lengthEl.min);
+        const max = parseInt(lengthEl.max);
+        
+        if (value < min) lengthEl.value = min;
+        if (value > max) lengthEl.value = max;
+        
+        generateBtn.click();
+    });
 
     // Generate event listen
     generateBtn.addEventListener('click', () => {
